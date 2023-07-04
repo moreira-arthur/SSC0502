@@ -27,16 +27,34 @@ typedef struct
     int qtd_id;
 }controle;
 
-void CriaBackup(FILE *arq2, controle controle, char url[]){
-    // Para garantir que nenhum usuário será perdido, decidimos fazer um
-    // arquivo de backup, com o objetivo de reguardar as informações
-    arq2 = fopen(url,"w");
-    if(arq2 == NULL){
+// void CriaBackup(FILE *arq2, controle controle, char url[]){
+//     // Para garantir que nenhum usuário será perdido, decidimos fazer um
+//     // arquivo de backup, com o objetivo de reguardar as informações
+//     arq2 = fopen(url,"w");
+//     if(arq2 == NULL){
+//         printf("Erro, nao foi possivel abrir o arquivo\n");
+//     }else{
+//         for(int i=0; i < (controle.tamanho - 1); i++)
+//             fprintf(arq2 ,"%d: %s , %d , %.2f\n",controle.cliente[i].id, controle.cliente[i].nome, controle.cliente[i].idade, controle.cliente[i].saldo);
+//     }
+//     fclose(arq2);
+// }
+void CriarArquivoFormatado(char url[],char url2[]){
+    //     // Para garantir que nenhum usuário será perdido, decidimos fazer um
+//     // arquivo de backup, com o objetivo de reguardar as informações
+    user ReadUser;
+    FILE *arq;
+    arq = fopen(url,"r");
+    FILE *arq2;
+    arq2 = fopen(url2,"w");
+    if(arq == NULL){
         printf("Erro, nao foi possivel abrir o arquivo\n");
     }else{
-        for(int i=0; i < (controle.tamanho - 1); i++)
-            fprintf(arq2 ,"%d: %s , %d , %.2f\n",controle.cliente[i].id, controle.cliente[i].nome, controle.cliente[i].idade, controle.cliente[i].saldo);
+        while((fscanf(arq,"%d %s %d %f\n",&ReadUser.id, &ReadUser.nome[0], &ReadUser.idade, &ReadUser.saldo))!=EOF){
+            fprintf(arq2 ,"%d: %s , %d , %.2f\n",ReadUser.id, ReadUser.nome, ReadUser.idade, ReadUser.saldo);                
+        }
     }
+    fclose(arq);
     fclose(arq2);
 }
 
@@ -375,11 +393,12 @@ int main(){
             break;
         case 0:
             Adeus();
-            CriaBackup(arq,controle,url2);
+            // CriaBackup(arq,controle,url2);
+            CriarArquivoFormatado(url,url2);
             break;
         default:
             opcao = 0;
-            CriaBackup(arq,controle,url2);
+            CriarArquivoFormatado(url,url2);
             break;
         }
     }while(opcao != 0);
