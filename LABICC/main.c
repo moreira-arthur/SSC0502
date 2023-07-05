@@ -1,7 +1,6 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
-#include<locale.h>
 #include<windows.h>
 
 // Estrutura de usuario, que armazena todas as suas informações
@@ -27,16 +26,26 @@ typedef struct
     int qtd_id;
 }controle;
 
-void CriaBackup(FILE *arq2, controle controle, char url[]){
-    // Para garantir que nenhum usuário será perdido, decidimos fazer um
+void CriarArquivoFormatado(char url[],char url2[]){
+
+    //  Para garantir que nenhum usuário será perdido, decidimos fazer um
     // arquivo de backup, com o objetivo de reguardar as informações
-    arq2 = fopen(url,"w");
-    if(arq2 == NULL){
+    // dos usuários, caso o arquivo principal seja corrompido
+    // Além disso, o arquivo de backup é formatado de maneira mais expositiva, de modo a facilitar a leitura, sendo assim o arquivo final
+
+    user ReadUser;
+    FILE *arq;
+    arq = fopen(url,"r");
+    FILE *arq2;
+    arq2 = fopen(url2,"w");
+    if(arq == NULL){
         printf("Erro, nao foi possivel abrir o arquivo\n");
     }else{
-        for(int i=0; i < (controle.tamanho - 1); i++)
-            fprintf(arq2 ,"%d: %s , %d , %.2f\n",controle.cliente[i].id, controle.cliente[i].nome, controle.cliente[i].idade, controle.cliente[i].saldo);
+        while((fscanf(arq,"%d/%d/%f/%[^\n]\n",&ReadUser.id, &ReadUser.idade, &ReadUser.saldo, &ReadUser.nome[0]))!=EOF){
+            fprintf(arq2 ,"%d: %s, %d, %.2f\n",ReadUser.id, ReadUser.nome, ReadUser.idade, ReadUser.saldo);                
+        }
     }
+    fclose(arq);
     fclose(arq2);
 }
 
@@ -44,43 +53,52 @@ void CriaBackup(FILE *arq2, controle controle, char url[]){
 // Além disso, possui uma forma de separar as informações dos usuários comuns dos administradores
 // que possuem uma senha com objetivo de visualizar o banco de dados de maneira mais expositiva 
 
-void MostrarTodos(FILE *arq2, controle controle, char url[],int senha){
-
+void MostrarTodos(FILE *arq2, char url[],int senha){
+    user ReadUser;
     arq2 = fopen(url,"r");
     if(arq2 == NULL){
         printf("Erro, nao foi possivel abrir o arquivo\n");
     }else{
         if(senha == 918273645){
-            for(int i=0; i < (controle.tamanho - 1); i++)
-            printf("\nID:%d\nNome: %s\nIdade: %d\nSaldo: %.2f\n",controle.cliente[i].id, controle.cliente[i].nome, controle.cliente[i].idade, controle.cliente[i].saldo);
+            while((fscanf(arq2,"%d/%d/%f/%[^\n]\n",&ReadUser.id, &ReadUser.idade, &ReadUser.saldo, &ReadUser.nome[0]))!=EOF){
+            printf("\nID:%d\nNome: %s\nIdade: %d\nSaldo: %.2f\n", ReadUser.id, ReadUser.nome, ReadUser.idade, ReadUser.saldo);
+            }
         }else{
-            for(int i=0; i < (controle.tamanho - 1); i++)
-            printf("\nNome: %s\nIdade: %d\nSaldo: %.2f\n", controle.cliente[i].nome, controle.cliente[i].idade, controle.cliente[i].saldo);
+            while((fscanf(arq2,"%d/%d/%f/%[^\n]\n",&ReadUser.id, &ReadUser.idade, &ReadUser.saldo, &ReadUser.nome[0]))!=EOF){
+            printf("\nNome: %s\nIdade: %d\nSaldo: %.2f\n", ReadUser.nome, ReadUser.idade, ReadUser.saldo);
+            }
         }
     }
     fclose(arq2);
 
 }
-
+void Saudacao(){
+    puts("-------------------------------------------------------------------------------------\n");
+    puts("BBBBBB     AAAAA    NNNN    NNNN   CCCCCC    OOOOOO         UUU   UUU   AAAAA   IIIII\n");
+    puts("BB  BBB   AA   AA   NNNNNN  NNNN  CCC       OO    OO       UUU   UUU  AA   AA   III \n");
+    puts("BBBBBB  AAAAAAAAA  NNN  NN NNNN CCC       OO    OO         UUU   UUU AAAAAAAAA  III \n");
+    puts("BB  BBB  AA     AA  NNN   NNNNNN CCC       OO    OO          UUU   UUU AA     AA  III \n");
+    puts("BBBBB   AA     AA  NNN    NNNNN  CCCCCC   OOOOOO            UUUUUU  AA     AA IIIII\n");
+    puts("-------------------------------------------------------------------------------------\n");
+    puts("-------------------------------Bem vindo ao Banco UaiBANK----------------------------\n");
+}
 // Para evitar escrever multiplas vezes o menu principal foi construida essa função,
 // simplificando assim o entendimento do código principal
-void MenuPrincipal(){
 
-    puts("-------------------------------------------------\n");
-    puts("----------Bem vindo ao Banco UaiBANK-------------\n");
-    puts("-------------------------------------------------\n");
-    puts("---------------Menu Principal--------------------\n");
-    puts("-------------------------------------------------\n");
-    puts("\nEscolha uma das opções abaixo:\n");
-    puts("1 - Cadastrar novo usuário.\n");
-    puts("2 - Cadastrar novos usuários.\n");
-    puts("3 - Consulta de usuário\n");
-    puts("4 - Transferência.\n");
-    puts("5 - Excluir usuário.\n");
-    puts("6 - Mostrar todos os usuários.\n");
-    puts("7 - ADMIN: Listar todos os usuários.\n");
+void MenuPrincipal(){
+    puts("-------------------------------------------------------------------------------------\n");
+    puts("-----------------------------------Menu Principal------------------------------------\n");
+    puts("-------------------------------------------------------------------------------------\n");
+    puts("\nEscolha uma das opcoes abaixo:\n");
+    puts("1 - Cadastrar novo usuario.\n");
+    puts("2 - Cadastrar novos usuarios.\n");
+    puts("3 - Consulta de usuario\n");
+    puts("4 - Transferencia.\n");
+    puts("5 - Excluir usuario.\n");
+    puts("6 - Mostrar todos os usuarios.\n");
+    puts("7 - ADMIN: Listar todos os usuarios.\n");
     puts("0 - Sair.\n");
-    puts("-------------------------------------------------\n");
+    puts("-------------------------------------------------------------------------------------\n");
 
 }
 
@@ -88,9 +106,9 @@ void MenuPrincipal(){
 
 void Adeus(){
 
-    puts("-------------------------------------------------\n");
-    puts("----------Obrigado por utilizar o UaiBANK--------\n");
-    puts("-------------------------------------------------\n");
+    puts("-------------------------------------------------------------------------------------\n");
+    puts("--------------------------Obrigado por utilizar o UaiBANK----------------------------\n");
+    puts("-------------------------------------------------------------------------------------\n");
     Sleep(2000);
 
 }   
@@ -98,37 +116,36 @@ void Adeus(){
 // Possui como entrada a estrura de controle e a estrutura de Usuario
 // a qual pela captação na parte principal do código obteve as informações 
 // do usuário
-int NovoUsuario(controle Control, user WriteUser){
+void NovoUsuario(controle Control, user WriteUser){
 
-    int tamanho = Control.tamanho;
+    printf("Usuario cadastrado com sucesso!\n\nID do %s do usuario: %d\n",WriteUser.nome,WriteUser.id);
+    
+    FILE *arq;
+    // Agora para armazenar as informações adicionadas no arquivo, ele é aberto no modo append, dessa forma adicionando apenas no final as novos informações
+    arq = fopen("dados.txt","a");
+
     //Adiciona no final do ponteiro o novo usuário
-    Control.cliente[tamanho - 1]= WriteUser;
+    Control.cliente[Control.tamanho - 1]= WriteUser;
     //Redimenciona o tamanho do ponteiro
-    Control.cliente = (user*)realloc(Control.cliente,(tamanho + 1) *sizeof(user));
+    Control.cliente = (user*)realloc(Control.cliente,(Control.tamanho + 1) *sizeof(user));
     // Se o redimencionamento falhar ela avisará
     if(Control.cliente == NULL){
-        puts("ERRO: Não foi possível alocar memória.\n");
+        puts("ERRO: Nao foi possivel alocar memoria.\n");
         Control.tamanho = 0;
-        return -2;
     }else{
         // senao ele foi redimencionado com sucesso e a variavel de controle possui seu tamanho aumentado em 1
         Control.tamanho++;
     }
-    printf("Usuário cadastrado com sucesso!\n\nID do %s do usuário: %d\n",WriteUser.nome,WriteUser.id);
 
-    FILE *arq;
-    // Agora para armazenar as informações adicionadas no arquivo, ele é aberto no modo append, dessa forma adicionando apenas no final as novos informações
-    arq = fopen("dados.txt","a");
     if(arq == NULL){
-        printf("Erro, nao foi possivel abrir o arquivo\n");
+        printf("ERRO: Nao foi possivel abrir o arquivo\n");
     }else{
         // Escreve no arquivo de controle finalmente as informações do usuário;
-        fprintf(arq ,"%d %s %d %.2f\n",WriteUser.id, WriteUser.nome, WriteUser.idade, WriteUser.saldo);
+        fprintf(arq ,"%d/%d/%.2f/%s\n",WriteUser.id, WriteUser.idade, WriteUser.saldo, WriteUser.nome);
     }
 
     fclose(arq);
 
-    return 3;
 }
 // Função com o objetivo de captar o indice do usuário no ponteiro de structs
 // sendo utilizado em outra partes do código como uma função complementar as 
@@ -158,7 +175,7 @@ void ConsultarUsuario(controle Control,int id){
     // Pode-se observar que essa convenção foi utilizado durante todo o código em que se é necessário fazer uma
     // manipulação de ids e usuários como controle.
     if(i == -1){
-        printf("ERRO: Usuário %dnão encontrado.\n", id);
+        printf("ERRO: Usuario %d nao encontrado.\n", id);
     }else{
         printf("ID: %d\nNome: %s\nIdade: %d\nSaldo: %.2f\n\n",Control.cliente[i].id, Control.cliente[i].nome, Control.cliente[i].idade, Control.cliente[i].saldo);
     }
@@ -171,7 +188,7 @@ void Transferencia(controle Control, int ido, int idd, float valor){
     int i1 = PegarPosicao(&Control,ido);
     int i2 = PegarPosicao(&Control,idd);
     int i;
-
+//REVER SE ESTA FUNCIONANDO DESDE A CRIACAO DE UM NOVO ARQUIVO
     if(Control.cliente[i1].saldo < valor){
         // Faz uma verificação se o usuario com o ido possui saldo suficiente em sua conta
         printf("ERRO: Cliente %s possui saldo insuficiente.\n", Control.cliente[i1].nome);
@@ -179,7 +196,7 @@ void Transferencia(controle Control, int ido, int idd, float valor){
         // Se sim o valor é decrementado de sua conta e incrementado na conta do usário de idd;
         Control.cliente[i1].saldo -= valor;
         Control.cliente[i2].saldo += valor;
-        printf("Transferência realizada com sucesso!\n");
+        printf("Transferencia realizada com sucesso!\n");
         
         // Como estamos modificando os valores de contas, optamos que a maneira mais simples seria reescrever o
         // arquivo de dados de controle, pois não pensamos em uma maneira mais eficiente de trocar essas informações
@@ -187,10 +204,10 @@ void Transferencia(controle Control, int ido, int idd, float valor){
         FILE *arq2;
         arq2 = fopen("dados.txt","w");
             if(arq2 == NULL){
-                printf("Erro, nao foi possivel abrir o arquivo\n");
+                printf("ERRO: Nao foi possivel abrir o arquivo\n");
             }else{
                 for(i=0; i < (Control.tamanho - 1); i++)
-                    fprintf(arq2 ,"%d %s %d %.2f\n",Control.cliente[i].id, Control.cliente[i].nome, Control.cliente[i].idade, Control.cliente[i].saldo);
+                    fprintf(arq2 ,"%d/%d/%.2f/%s\n",Control.cliente[i].id, Control.cliente[i].idade, Control.cliente[i].saldo, Control.cliente[i].nome);
             }
         fclose(arq2);
     }
@@ -205,16 +222,16 @@ void ExcluirUsuario(controle Control, int ide){
         }
         Control.tamanho -= 1;
         Control.cliente = (user*)realloc(Control.cliente,(Control.tamanho + 1) * sizeof(user));
-        printf("Usuário %d excluído com sucesso!\n", ide);
+        printf("Usuario %d excluido com sucesso!\n", ide);
 
         FILE *arq2;
 
         arq2 = fopen("dados.txt","w");
             if(arq2 == NULL){
-                printf("Erro, nao foi possivel abrir o arquivo\n");
+                printf("ERRO: Nao foi possivel abrir o arquivo\n");
             }else{
                 for(i=0; i < (Control.tamanho - 1); i++)
-                    fprintf(arq2 ,"%d %s %d %.2f\n",Control.cliente[i].id, Control.cliente[i].nome, Control.cliente[i].idade, Control.cliente[i].saldo);
+                    fprintf(arq2 ,"%d/%d/%.2f/%s\n",Control.cliente[i].id, Control.cliente[i].idade, Control.cliente[i].saldo, Control.cliente[i].nome);
             }
 
         fclose(arq2);
@@ -224,15 +241,13 @@ void ExcluirUsuario(controle Control, int ide){
 
 int main(){
 
-    setlocale(LC_ALL,"pt_BR.UTF-8");
-
     controle controle;	
-    controle.cliente = (user*)malloc(1*sizeof(user));
+    controle.cliente = (user*)malloc(2*sizeof(user));
     controle.tamanho = 1;
     controle.qtd_id = 0;
 
     char url [] = "dados.txt";
-    char url2 [] = "BackupDados.txt";
+    char url2 [] = "DadosFinais.txt";
     // char nome [100];
     // int id,idade;
     // float saldo;
@@ -252,10 +267,8 @@ int main(){
     //Leitura do arquivo de dados já existente
     FILE *arq;
     arq = fopen(url,"r");
-    if(arq == NULL){
-        printf("Erro, nao foi possivel abrir o arquivo\n");
-    }else{
-        while((fscanf(arq,"%d %s %d %f\n",&ReadUser.id, &ReadUser.nome[0], &ReadUser.idade, &ReadUser.saldo))!=EOF){
+    if(arq != NULL){
+        while((fscanf(arq,"%d/%d/%f/%[^\n]\n",&ReadUser.id, &ReadUser.idade, &ReadUser.saldo, &ReadUser.nome[0]))!=EOF){
             // printf("ID: %d\nNome: %s\nIdade: %d\nSaldo: %.2f\n\n",id, nome, idade, saldo);
             controle.cliente = (user*)realloc(controle.cliente,(controle.tamanho + 1) *sizeof(user));
             controle.cliente[controle.tamanho - 1].id = ReadUser.id;
@@ -265,8 +278,12 @@ int main(){
             controle.tamanho++;
             controle.qtd_id = ReadUser.id;
         }
+    }else{
+        arq = fopen(url,"w");
     }
     fclose(arq);
+
+    Saudacao();
 
     do{
         MenuPrincipal();
@@ -277,38 +294,40 @@ int main(){
             //Adicionar um novo usuário
         case 1:
             getchar();
-            puts("Preeencha suas informaçoẽs abaixo:\n");
+            puts("Preeencha suas informacoes abaixo:\n");
             puts("Padrao de preenchimento: Nome, Idade, Saldo\n");
-            scanf("%[^,], %d, %f", WriteUser.nome, &WriteUser.idade, &WriteUser.saldo);
+            scanf("%[^,], %d, %f", WriteUser.nome, &WriteUser.idade, &WriteUser.saldo); setbuf(stdin,NULL);
             if(WriteUser.idade < 18){
-                puts("ERRO: Você não pode se cadastrar, pois é menor de idade.\n");
+                puts("ERRO: Voce nao pode se cadastrar, visto que ainda nao possui 18 anos.\n");
                 break; 
             }else if (WriteUser.saldo < 0){
-                puts("ERRO: Você não pode se cadastrar, pois seu saldo é negativo.\n");
+                puts("ERRO: Voce nao pode se cadastrar, saldo insuficiente.\n");
                 break;
             }
+            // Como o id é único, ele é incrementado a cada novo usuário
             controle.qtd_id += 1;
             WriteUser.id = controle.qtd_id;
             NovoUsuario(controle,WriteUser);
-            system("pause");
+            Sleep(2000);
             break;
             //Adicionar vários usuários
         case 2:
 
-            puts("Quantos usuários deseja cadastrar?\n");
+            puts("Quantos usuarios deseja cadastrar?\n");
             scanf("%d",&quantidade);
             for(i=0; i < quantidade; i++){
                 getchar();
-                puts("Preeencha suas informaçoẽs abaixo:\n");
+                printf("Preeencha suas informacoes abaixo sobre o usuario: %d.\n",i+1);
                 puts("Padrao de preenchimento: Nome, Idade, Saldo\n");
-                scanf("%[^,], %d, %f", WriteUser.nome, &WriteUser.idade, &WriteUser.saldo);
+                scanf("%[^,], %d, %f", WriteUser.nome, &WriteUser.idade, &WriteUser.saldo); setbuf(stdin,NULL);
                 if(WriteUser.idade < 18){
-                    puts("ERRO: Você não pode se cadastrar, pois é menor de idade.\n");
+                    puts("ERRO: Você nao pode se cadastrar, visto que ainda nao possui 18 anos.\n");
                     break; 
                 }else if (WriteUser.saldo < 0){
-                    puts("ERRO: Você não pode se cadastrar, pois seu saldo é negativo.\n");
+                    puts("ERRO: Você não pode se cadastrar, saldo insuficiente. \n");
                     break;
                 }
+                // Como o id é único, ele é incrementado a cada novo usuário
                 controle.qtd_id += 1;
                 WriteUser.id = controle.qtd_id;
                 NovoUsuario(controle,WriteUser);
@@ -318,29 +337,29 @@ int main(){
             //Consulta de usuário
         case 3:
             getchar();
-            puts("Digite o ID do usuário que deseja consultar:\n");
-            scanf("%d",&id_consulta);
+            puts("Digite o ID do usuario que deseja consultar:\n");
+            scanf("%d",&id_consulta); setbuf(stdin,NULL);
             ConsultarUsuario(controle, id_consulta);
             system("pause");
             break;
             //Transferência de saldo
         case 4:
-            puts("Digite o ID do usuário que deseja transferir:\n");
-            scanf("%d",&id_origem);
+            puts("Digite o ID do usuario que deseja transferir:\n");
+            scanf("%d",&id_origem); setbuf(stdin,NULL);
             if(id_origem == 0 || PegarPosicao(&controle,id_origem) == -1){
-                puts("ERRO: Você não pode transferir de uma conta inexistente.\n");
+                puts("ERRO: Voce nao pode transferir de uma conta inexistente.\n");
                 break;
             }
-            puts("Digite o ID do usuário que deseja receber a transferência:\n");
-            scanf("%d",&id_destino);
+            puts("Digite o ID do usuário que deseja receber a transferencia:\n");
+            scanf("%d",&id_destino); setbuf(stdin,NULL);
             if(id_destino == 0 || PegarPosicao(&controle,id_destino) == -1){
-                puts("ERRO: Você não pode transferir para uma conta inexistente.\n");
+                puts("ERRO: Voce nao pode transferir para uma conta inexistente.\n");
                 break;
             }
             puts("Digite o valor que deseja transferir:\n");
-            scanf("%f",&valor_transferencia);
+            scanf("%f",&valor_transferencia); setbuf(stdin,NULL);
             if(valor_transferencia < 0){
-                puts("ERRO: Você não pode transferir um valor negativo.\n");
+                puts("ERRO: Voce nao pode transferir um valor negativo.\n");
                 break;
             }
             Transferencia(controle,id_origem,id_destino,valor_transferencia);
@@ -348,10 +367,10 @@ int main(){
             break;
             // Excluir usuário
         case 5:
-            puts("Digite o ID do usuário que deseja excluir:\n");
-            scanf("%d",&id_exclusao);
+            puts("Digite o ID do usuario que deseja excluir:\n");
+            scanf("%d",&id_exclusao); setbuf(stdin,NULL);
             if(id_exclusao == 0 || PegarPosicao(&controle,id_exclusao) == -1){
-                puts("ERRO: Você não pode excluir uma conta inexistente.\n");
+                puts("ERRO: Voce nao pode excluir uma conta inexistente.\n");
                 system("pause");
                 break;
             }
@@ -361,25 +380,27 @@ int main(){
             //Mostrar todos os usuários 
         case 6:
             senha = 0;
-            puts("Os usuários presentes no sistema até o momento são:\n");
-            MostrarTodos(arq,controle, url, senha);
+            puts("Os usuarios presentes no sistema ate o momento sao:\n");
+            MostrarTodos(arq, url, senha);
             system("pause");
             break;
         case 7:
             puts("Digite a senha de administrador: ");
-            scanf("%d",&senha);
-            puts("Os usuários presentes no sistema até o momento são:\n");
-            MostrarTodos(arq,controle, url, senha);
+            scanf("%d",&senha); setbuf(stdin,NULL);
+            puts("Os usuarios presentes no sistema ate o momento sao:\n");
+            MostrarTodos(arq, url, senha);
             system("pause");
             system("cls");
             break;
         case 0:
             Adeus();
-            CriaBackup(arq,controle,url2);
+            CriarArquivoFormatado(url,url2);
             break;
         default:
+            puts("Opção inválida.\n");
             opcao = 0;
-            CriaBackup(arq,controle,url2);
+            CriarArquivoFormatado(url,url2);
+            Adeus();
             break;
         }
     }while(opcao != 0);
@@ -387,4 +408,5 @@ int main(){
     free(controle.cliente);
 
     return 0;
+
 }
