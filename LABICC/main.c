@@ -254,6 +254,7 @@ void Transferencia(int ido, int idd, float valor, char url[]){
             }
         fclose(arq2);
     }
+    free(ReadControl.cliente);
 }
 
 
@@ -307,6 +308,7 @@ void ExcluirUsuario(int ide, char url[]){
 
         fclose(arq2);
     }
+    free(ReadControl.cliente);
 }
 
 
