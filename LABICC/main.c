@@ -15,7 +15,7 @@ typedef struct
 
 // Como em C, diferentemente de outras linguagens de mais alto nivel 
 // não temos uma manipulação tão prática para obter o tamanho de vetores
-// optamos por contruir uma outra Estrutura de controle, com o objetivo de 
+// optamos por construir uma outra Estrutura de controle, com o objetivo de 
 // armazenar o tamanho do ponteiro, além de garantir a unicidade dos ids de
 // cada usuário
 
@@ -255,7 +255,8 @@ void Transferencia(int ido, int idd, float valor, char url[]){
         fclose(arq2);
     }
 }
-// obs: está funcionando, mas está estranho
+
+
 void ExcluirUsuario(int ide, char url[]){
 
     user ReadUser;
@@ -357,7 +358,9 @@ int main(){
 
     do{
         MenuPrincipal();
-        scanf("%d",&opcao);
+        scanf("%d",&opcao); setbuf(stdin,NULL);
+
+        if(opcao>=0||opcao<=6){
 
         switch (opcao)
         {
@@ -451,11 +454,14 @@ int main(){
             break;
         default:
             puts("Opção inválida.\n");
-            opcao = 0;
             CriarArquivoFormatado(url,url2);
             Adeus();
             break;
         }
+    }else{
+        printf("Opção inválida.\n");
+        Sleep(1000);
+    }
     }while(opcao != 0);
 
     free(controle.cliente);
