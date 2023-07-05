@@ -2,6 +2,7 @@
 #include<stdlib.h>
 #include<string.h>
 #include<windows.h>
+#include<ctype.h>
 
 // Estrutura de usuario, que armazena todas as suas informações
 
@@ -77,7 +78,7 @@ void Saudacao(){
     puts("BBBBBB     AAAAA    NNNN    NNNN   CCCCCC    OOOOOO         UUU   UUU   AAAAA   IIIII\n");
     puts("BB  BBB   AA   AA   NNNNNN  NNNN  CCC       OO    OO       UUU   UUU  AA   AA   III \n");
     puts("BBBBBB  AAAAAAAAA  NNN  NN NNNN CCC       OO    OO         UUU   UUU AAAAAAAAA  III \n");
-    puts("BB  BBB  AA     AA  NNN   NNNNNN CCC       OO    OO          UUU   UUU AA     AA  III \n");
+    puts("BB  BBB  AA     AA  NNN   NNNNNN CCC       OO    OO        UUU   UUU AA     AA  III \n");
     puts("BBBBB   AA     AA  NNN    NNNNN  CCCCCC   OOOOOO            UUUUUU  AA     AA IIIII\n");
     puts("-------------------------------------------------------------------------------------\n");
     puts("-------------------------------Bem vindo ao Banco UaiBANK----------------------------\n");
@@ -372,6 +373,16 @@ int main(){
             puts("Preeencha suas informacoes abaixo:\n");
             puts("Padrao de preenchimento: Nome, Idade, Saldo\n");
             scanf("%[^,], %d, %f", WriteUser.nome, &WriteUser.idade, &WriteUser.saldo); setbuf(stdin,NULL);
+            for(i = 0; i < strlen(WriteUser.nome); i++){
+                if(!isalpha(WriteUser.nome[i])){
+                    i = -1;
+                    break;
+                }
+            }
+            if(i == -1){
+                printf("ERRO: A string contem caracteres nao alfabeticos\n");
+                break;
+            }
             if(WriteUser.idade < 18){
                 puts("ERRO: Voce nao pode se cadastrar, visto que ainda nao possui 18 anos.\n");
                 break; 
