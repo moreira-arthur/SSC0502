@@ -167,35 +167,78 @@ int PegarPosicao(controle *Control, int id){
 // Função com o objetivo de consultar um usuário especifico através de seu código de id
 // Recebe como entrada a struct de controle e o id, e por se tratar de uma void function
 // não oferece nenhum retorno
-void ConsultarUsuario(controle Control,int id){
+void ConsultarUsuario(int id, char url[]){
 
-    // Pegando o indice do usuario através de seu id;
-    int i = PegarPosicao(&Control,id);
-    // Como convenção nesse código utilizamos o valor de -1 associado ao id para dizer que um usuário não existe 
-    // Pode-se observar que essa convenção foi utilizado durante todo o código em que se é necessário fazer uma
-    // manipulação de ids e usuários como controle.
-    if(i == -1){
-        printf("ERRO: Usuario %d nao encontrado.\n", id);
-    }else{
-        printf("ID: %d\nNome: %s\nIdade: %d\nSaldo: %.2f\n\n",Control.cliente[i].id, Control.cliente[i].nome, Control.cliente[i].idade, Control.cliente[i].saldo);
+    user ReadUser;
+    int valid = 0;
+    FILE *arq;
+    arq = fopen(url,"r");
+    if(arq != NULL){
+        while((fscanf(arq,"%d/%d/%f/%[^\n]\n",&ReadUser.id, &ReadUser.idade, &ReadUser.saldo, &ReadUser.nome[0]))!=EOF){
+            // printf("ID: %d\nNome: %s\nIdade: %d\nSaldo: %.2f\n\n",id, nome, idade, saldo);
+            if(ReadUser.id == id){
+                printf("ID: %d\nNome: %s\nIdade: %d\nSaldo: %.2f\n\n",ReadUser.id, ReadUser.nome, ReadUser.idade, ReadUser.saldo);
+                valid = 1;
+            }
+        }
     }
+    if(valid == 0){
+        printf("ERRO: Usuario %d nao encontrado.\n", id);
+    }
+    fclose(arq);
 
 }
 
 //Função de tranferência de dinheiro entre os usuários
 // Possui como entrada a struct de controle, o id de origem (ido), o id de destino (idd) e o valor a ser tranferido(valor)
-void Transferencia(controle Control, int ido, int idd, float valor){
-    int i1 = PegarPosicao(&Control,ido);
-    int i2 = PegarPosicao(&Control,idd);
+void Transferencia(int ido, int idd, float valor, char url[]){
+
+    user ReadUser;
+    controle ReadControl;
+    ReadControl.cliente = (user*)malloc(sizeof(user));
+    ReadControl.tamanho = 1;
+
+    FILE *arq;
+    arq = fopen(url,"r");
+    if(arq != NULL){
+        while((fscanf(arq,"%d/%d/%f/%[^\n]\n",&ReadUser.id, &ReadUser.idade, &ReadUser.saldo, &ReadUser.nome[0]))!=EOF){
+            // printf("ID: %d\nNome: %s\nIdade: %d\nSaldo: %.2f\n\n",id, nome, idade, saldo);
+            ReadControl.cliente = (user*)realloc(ReadControl.cliente,(ReadControl.tamanho + 1) *sizeof(user));
+            ReadControl.cliente[ReadControl.tamanho - 1].id = ReadUser.id;
+            strcpy(ReadControl.cliente[ReadControl.tamanho - 1].nome,ReadUser.nome);
+            ReadControl.cliente[ReadControl.tamanho - 1].idade = ReadUser.idade;
+            ReadControl.cliente[ReadControl.tamanho - 1].saldo = ReadUser.saldo;
+            ReadControl.tamanho++;
+            ReadControl.qtd_id = ReadUser.id;
+        }
+    }
+
+    fclose(arq);
+
+    int i1 = PegarPosicao(&ReadControl,ido);
+    int i2 = PegarPosicao(&ReadControl,idd);
     int i;
-//REVER SE ESTA FUNCIONANDO DESDE A CRIACAO DE UM NOVO ARQUIVO
-    if(Control.cliente[i1].saldo < valor){
+
+    if(ido == 0 || i1 == -1){
+        puts("ERRO: Voce nao pode transferir de uma conta inexistente.\n");
+        return;
+    }
+    if(idd == 0 || i2 == -1){
+        puts("ERRO: Voce nao pode transferir para uma conta inexistente.\n");
+        return;
+    }
+    if(valor < 0){
+        puts("ERRO: Voce nao pode transferir um valor negativo.\n");
+        return;
+    }
+
+    if(ReadControl.cliente[i1].saldo < valor){
         // Faz uma verificação se o usuario com o ido possui saldo suficiente em sua conta
-        printf("ERRO: Cliente %s possui saldo insuficiente.\n", Control.cliente[i1].nome);
+        printf("ERRO: Cliente %s possui saldo insuficiente.\n", ReadControl.cliente[i1].nome);
     }else{
         // Se sim o valor é decrementado de sua conta e incrementado na conta do usário de idd;
-        Control.cliente[i1].saldo -= valor;
-        Control.cliente[i2].saldo += valor;
+        ReadControl.cliente[i1].saldo -= valor;
+        ReadControl.cliente[i2].saldo += valor;
         printf("Transferencia realizada com sucesso!\n");
         
         // Como estamos modificando os valores de contas, optamos que a maneira mais simples seria reescrever o
@@ -206,22 +249,49 @@ void Transferencia(controle Control, int ido, int idd, float valor){
             if(arq2 == NULL){
                 printf("ERRO: Nao foi possivel abrir o arquivo\n");
             }else{
-                for(i=0; i < (Control.tamanho - 1); i++)
-                    fprintf(arq2 ,"%d/%d/%.2f/%s\n",Control.cliente[i].id, Control.cliente[i].idade, Control.cliente[i].saldo, Control.cliente[i].nome);
+                for(i=0; i < (ReadControl.tamanho - 1); i++)
+                    fprintf(arq2 ,"%d/%d/%.2f/%s\n",ReadControl.cliente[i].id, ReadControl.cliente[i].idade, ReadControl.cliente[i].saldo, ReadControl.cliente[i].nome);
             }
         fclose(arq2);
     }
 }
 // obs: está funcionando, mas está estranho
-void ExcluirUsuario(controle Control, int ide){
-    int i = PegarPosicao(&Control,ide);
+void ExcluirUsuario(int ide, char url[]){
+
+    user ReadUser;
+    controle ReadControl;
+    ReadControl.cliente = (user*)malloc(sizeof(user));
+    ReadControl.tamanho = 1;
+
+    FILE *arq;
+    arq = fopen(url,"r");
+    if(arq != NULL){
+        while((fscanf(arq,"%d/%d/%f/%[^\n]\n",&ReadUser.id, &ReadUser.idade, &ReadUser.saldo, &ReadUser.nome[0]))!=EOF){
+            // printf("ID: %d\nNome: %s\nIdade: %d\nSaldo: %.2f\n\n",id, nome, idade, saldo);
+            ReadControl.cliente = (user*)realloc(ReadControl.cliente,(ReadControl.tamanho + 1) *sizeof(user));
+            ReadControl.cliente[ReadControl.tamanho - 1].id = ReadUser.id;
+            strcpy(ReadControl.cliente[ReadControl.tamanho - 1].nome,ReadUser.nome);
+            ReadControl.cliente[ReadControl.tamanho - 1].idade = ReadUser.idade;
+            ReadControl.cliente[ReadControl.tamanho - 1].saldo = ReadUser.saldo;
+            ReadControl.tamanho++;
+            ReadControl.qtd_id = ReadUser.id;
+        }
+    }
+
+    fclose(arq);
+    int i = PegarPosicao(&ReadControl,ide);
+    if(ide == 0 || i == -1){
+        puts("ERRO: Voce nao pode excluir uma conta inexistente.\n");
+        system("pause");
+        return;
+    }
     int index;
     if(i > -1){
-        for((index = i+1);(index < (Control.tamanho - 1));(index++)){
-            Control.cliente[index - 1] = Control.cliente[index];
+        for((index = i+1);(index < (ReadControl.tamanho - 1));(index++)){
+            ReadControl.cliente[index - 1] = ReadControl.cliente[index];
         }
-        Control.tamanho -= 1;
-        Control.cliente = (user*)realloc(Control.cliente,(Control.tamanho + 1) * sizeof(user));
+        ReadControl.tamanho -= 1;
+        ReadControl.cliente = (user*)realloc(ReadControl.cliente,(ReadControl.tamanho + 1) * sizeof(user));
         printf("Usuario %d excluido com sucesso!\n", ide);
 
         FILE *arq2;
@@ -230,8 +300,8 @@ void ExcluirUsuario(controle Control, int ide){
             if(arq2 == NULL){
                 printf("ERRO: Nao foi possivel abrir o arquivo\n");
             }else{
-                for(i=0; i < (Control.tamanho - 1); i++)
-                    fprintf(arq2 ,"%d/%d/%.2f/%s\n",Control.cliente[i].id, Control.cliente[i].idade, Control.cliente[i].saldo, Control.cliente[i].nome);
+                for(i=0; i < (ReadControl.tamanho - 1); i++)
+                    fprintf(arq2 ,"%d/%d/%.2f/%s\n",ReadControl.cliente[i].id, ReadControl.cliente[i].idade, ReadControl.cliente[i].saldo, ReadControl.cliente[i].nome);
             }
 
         fclose(arq2);
@@ -339,42 +409,25 @@ int main(){
             getchar();
             puts("Digite o ID do usuario que deseja consultar:\n");
             scanf("%d",&id_consulta); setbuf(stdin,NULL);
-            ConsultarUsuario(controle, id_consulta);
+            ConsultarUsuario(id_consulta,url);
             system("pause");
             break;
             //Transferência de saldo
         case 4:
             puts("Digite o ID do usuario que deseja transferir:\n");
             scanf("%d",&id_origem); setbuf(stdin,NULL);
-            if(id_origem == 0 || PegarPosicao(&controle,id_origem) == -1){
-                puts("ERRO: Voce nao pode transferir de uma conta inexistente.\n");
-                break;
-            }
             puts("Digite o ID do usuário que deseja receber a transferencia:\n");
             scanf("%d",&id_destino); setbuf(stdin,NULL);
-            if(id_destino == 0 || PegarPosicao(&controle,id_destino) == -1){
-                puts("ERRO: Voce nao pode transferir para uma conta inexistente.\n");
-                break;
-            }
             puts("Digite o valor que deseja transferir:\n");
             scanf("%f",&valor_transferencia); setbuf(stdin,NULL);
-            if(valor_transferencia < 0){
-                puts("ERRO: Voce nao pode transferir um valor negativo.\n");
-                break;
-            }
-            Transferencia(controle,id_origem,id_destino,valor_transferencia);
+            Transferencia(id_origem,id_destino,valor_transferencia,url);
             system("pause");
             break;
             // Excluir usuário
         case 5:
             puts("Digite o ID do usuario que deseja excluir:\n");
             scanf("%d",&id_exclusao); setbuf(stdin,NULL);
-            if(id_exclusao == 0 || PegarPosicao(&controle,id_exclusao) == -1){
-                puts("ERRO: Voce nao pode excluir uma conta inexistente.\n");
-                system("pause");
-                break;
-            }
-            ExcluirUsuario(controle,id_exclusao);
+            ExcluirUsuario(id_exclusao, url);
             system("pause");
             break;
             //Mostrar todos os usuários 
