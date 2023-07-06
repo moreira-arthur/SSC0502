@@ -385,6 +385,7 @@ int main(){
         {
             //Adicionar um novo usuário
         case 1:
+            system("cls");
             setbuf(stdin,NULL);
             puts("Preeencha suas informacoes abaixo:\n");
             puts("Padrao de preenchimento: Nome, Idade, Saldo\n");
@@ -410,7 +411,7 @@ int main(){
             break;
             //Adicionar vários usuários
         case 2:
-
+            system("cls");
             puts("Quantos usuarios deseja cadastrar?\n");
             scanf("%d",&quantidade); setbuf(stdin,NULL);
             for(i=0; i < quantidade; i++){
@@ -447,6 +448,7 @@ int main(){
             
             //Consulta de usuário
         case 3:
+            system("cls"); 
             puts("Digite o ID do usuario que deseja consultar:\n");
             scanf("%d",&id_consulta); setbuf(stdin,NULL);
             ConsultarUsuario(id_consulta,url);
@@ -455,6 +457,7 @@ int main(){
             break;
             //Transferência de saldo
         case 4:
+            system("cls"); 
             puts("Digite o ID do usuario que deseja transferir:\n");
             scanf("%d",&id_origem); setbuf(stdin,NULL);
             puts("Digite o ID do usuário que deseja receber a transferencia:\n");
@@ -467,6 +470,7 @@ int main(){
             break;
             // Excluir usuário
         case 5:
+            system("cls"); 
             puts("Digite o ID do usuario que deseja excluir:\n");
             scanf("%d",&id_exclusao); setbuf(stdin,NULL);
             ExcluirUsuario(id_exclusao, url);
@@ -475,6 +479,7 @@ int main(){
             break;
             //Mostrar todos os usuários 
         case 6:
+            system("cls"); 
             senha = 0;
             puts("Os usuarios presentes no sistema ate o momento sao:\n");
             MostrarTodos(arq, url, senha);
@@ -482,6 +487,7 @@ int main(){
             system("cls");
             break;
         case 7:
+            system("cls"); 
             puts("Digite a senha de administrador: ");
             scanf("%d",&senha); setbuf(stdin,NULL);
             puts("Os usuarios presentes no sistema ate o momento sao:\n");
@@ -490,6 +496,7 @@ int main(){
             system("cls");
             break;
         case 0:
+            system("cls"); 
             Adeus();
             CriarArquivoFormatado(url,url2);
             break;
