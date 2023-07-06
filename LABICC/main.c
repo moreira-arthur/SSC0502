@@ -363,7 +363,7 @@ int main(){
         MenuPrincipal();
         scanf("%d",&opcao); setbuf(stdin,NULL);
 
-        if(opcao>=0||opcao<=6){
+        if(opcao>=0 && opcao<=7){
 
         switch (opcao)
         {
