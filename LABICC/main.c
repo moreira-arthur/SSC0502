@@ -257,8 +257,6 @@ void Transferencia(int ido, int idd, float valor, char url[]){
     }
     free(ReadControl.cliente);
 }
-
-
 void ExcluirUsuario(int ide, char url[]){
 
     user ReadUser;
@@ -312,6 +310,23 @@ void ExcluirUsuario(int ide, char url[]){
     free(ReadControl.cliente);
 }
 
+// verifica se tem um numero no nome
+int VerificaNumeroNome( char nome[]){
+    int controle_nome = 0;
+    int i;
+    for(i = 0; i < strlen(nome); i++){
+        if(!isalpha(nome[i])){
+            controle_nome -= 1;
+        }
+        if(isspace(nome[i])){
+            controle_nome += 1;
+        }
+    }
+    if(controle_nome != 0){
+        return -1;            
+    }
+    return 0;
+}
 
 int main(){
 
@@ -328,7 +343,7 @@ int main(){
     user ReadUser;
     user WriteUser;
 
-    int opcao;
+    char opcao;
     int quantidade;
     int i;
     int id_consulta = 0;
@@ -337,6 +352,7 @@ int main(){
     int id_exclusao = 0;
     float valor_transferencia = 0;
     int senha;
+    int controle_nome = 0;
 
     //Leitura do arquivo de dados já existente
     FILE *arq;
@@ -359,29 +375,24 @@ int main(){
 
     Saudacao();
 
-    do{
+    do{ // Loop principal do programa
         MenuPrincipal();
-        scanf("%d",&opcao); setbuf(stdin,NULL);
-
-        if(opcao>=0 && opcao<=7){
-
+        printf("Digite a opcao desejada: ");
+        // Trabalhando comforme a tabela ASCII
+        opcao = getchar() - 48;
+        // printf("%d\n",opcao); // Usado para a debugacao
         switch (opcao)
         {
             //Adicionar um novo usuário
         case 1:
-            getchar();
+            setbuf(stdin,NULL);
             puts("Preeencha suas informacoes abaixo:\n");
             puts("Padrao de preenchimento: Nome, Idade, Saldo\n");
             scanf("%[^,], %d, %f", WriteUser.nome, &WriteUser.idade, &WriteUser.saldo); setbuf(stdin,NULL);
-            for(i = 0; i < strlen(WriteUser.nome); i++){
-                if(!isalpha(WriteUser.nome[i])){
-                    i = -1;
-                    break;
-                }
-            }
-            if(i == -1){
+            controle_nome = VerificaNumeroNome(WriteUser.nome);
+            if(controle_nome == -1){
                 printf("ERRO: A string contem caracteres nao alfabeticos\n");
-                break;
+                break;            
             }
             if(WriteUser.idade < 18){
                 puts("ERRO: Voce nao pode se cadastrar, visto que ainda nao possui 18 anos.\n");
@@ -394,39 +405,53 @@ int main(){
             controle.qtd_id += 1;
             WriteUser.id = controle.qtd_id;
             NovoUsuario(controle,WriteUser);
-            Sleep(2000);
+            system("pause");
+            system("cls"); 
             break;
             //Adicionar vários usuários
         case 2:
 
             puts("Quantos usuarios deseja cadastrar?\n");
-            scanf("%d",&quantidade);
+            scanf("%d",&quantidade); setbuf(stdin,NULL);
             for(i=0; i < quantidade; i++){
-                getchar();
                 printf("Preeencha suas informacoes abaixo sobre o usuario: %d.\n",i+1);
                 puts("Padrao de preenchimento: Nome, Idade, Saldo\n");
                 scanf("%[^,], %d, %f", WriteUser.nome, &WriteUser.idade, &WriteUser.saldo); setbuf(stdin,NULL);
+                controle_nome = VerificaNumeroNome(WriteUser.nome);
+                if(controle_nome == -1){
+                    printf("ERRO: A string contem caracteres nao alfabeticos\n");
+                    system("pause");
+                    system("cls"); 
+                    break;            
+                }
                 if(WriteUser.idade < 18){
                     puts("ERRO: Você nao pode se cadastrar, visto que ainda nao possui 18 anos.\n");
-                    break; 
+                    system("pause");
+                    system("cls"); 
+                    break;
                 }else if (WriteUser.saldo < 0){
                     puts("ERRO: Você não pode se cadastrar, saldo insuficiente. \n");
+                    system("pause");
+                    system("cls");
                     break;
                 }
                 // Como o id é único, ele é incrementado a cada novo usuário
                 controle.qtd_id += 1;
                 WriteUser.id = controle.qtd_id;
                 NovoUsuario(controle,WriteUser);
-                Sleep(2000);
+                puts("\n\n");
             }
+            system("pause");
+            system("cls");
             break;
+            
             //Consulta de usuário
         case 3:
-            getchar();
             puts("Digite o ID do usuario que deseja consultar:\n");
             scanf("%d",&id_consulta); setbuf(stdin,NULL);
             ConsultarUsuario(id_consulta,url);
             system("pause");
+            system("cls");
             break;
             //Transferência de saldo
         case 4:
@@ -438,6 +463,7 @@ int main(){
             scanf("%f",&valor_transferencia); setbuf(stdin,NULL);
             Transferencia(id_origem,id_destino,valor_transferencia,url);
             system("pause");
+            system("cls");
             break;
             // Excluir usuário
         case 5:
@@ -445,6 +471,7 @@ int main(){
             scanf("%d",&id_exclusao); setbuf(stdin,NULL);
             ExcluirUsuario(id_exclusao, url);
             system("pause");
+            system("cls");
             break;
             //Mostrar todos os usuários 
         case 6:
@@ -452,6 +479,7 @@ int main(){
             puts("Os usuarios presentes no sistema ate o momento sao:\n");
             MostrarTodos(arq, url, senha);
             system("pause");
+            system("cls");
             break;
         case 7:
             puts("Digite a senha de administrador: ");
@@ -466,15 +494,9 @@ int main(){
             CriarArquivoFormatado(url,url2);
             break;
         default:
-            puts("Opção inválida.\n");
-            CriarArquivoFormatado(url,url2);
-            Adeus();
+            system("cls");
             break;
         }
-    }else{
-        printf("Opção inválida.\n");
-        Sleep(1000);
-    }
     }while(opcao != 0);
 
     free(controle.cliente);
