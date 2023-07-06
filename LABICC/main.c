@@ -326,7 +326,7 @@ void ExcluirUsuario(int ide, char url[]){
 int VerificaNumeroNome( char nome[]){
     int controle_nome = 0;
     int i;
-    for(i = 0; i < strlen(nome); i++){
+    for(i = 0; i < (int)strlen(nome); i++){
         if(!isalpha(nome[i])){
             controle_nome -= 1;
         }

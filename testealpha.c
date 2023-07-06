@@ -7,7 +7,7 @@
 int VerificaNumeroNome( char nome[]){
     int controle_nome = 0;
     int i;
-    for(i = 0; i < strlen(nome); i++){
+    for(i = 0; i < (int)strlen(nome); i++){
         if(!isalpha(nome[i])){
             controle_nome -= 1;
         }
@@ -25,7 +25,6 @@ int VerificaNumeroNome( char nome[]){
 int main(){
     char str[100];
     int controle = 0;
-    int i;
     int retorno;
     gets(str);
     retorno = VerificaNumeroNome(str);
