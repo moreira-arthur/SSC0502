@@ -73,6 +73,7 @@ void MostrarTodos(FILE *arq2, char url[],int senha){
     fclose(arq2);
 
 }
+
 void Saudacao(){
     puts("-------------------------------------------------------------------------------------\n");
     puts("BBBBBB     AAAAA    NNNN    NNNN   CCCCCC    OOOOOO         UUU   UUU   AAAAA   IIIII\n");
@@ -192,6 +193,10 @@ void ConsultarUsuario(int id, char url[]){
 
 //Função de tranferência de dinheiro entre os usuários
 // Possui como entrada a struct de controle, o id de origem (ido), o id de destino (idd) e o valor a ser tranferido(valor)
+// Por se tratar de uma void function não possui nenhum retorno
+// Para garantir o máximo de sincronismo do programa com o arquivo, foi feito a leitura do arquivo e armazenado em um ponteiro de structs
+// e depois de feito as alterações necessárias, o arquivo é reescrito com as novas informações
+
 void Transferencia(int ido, int idd, float valor, char url[]){
 
     user ReadUser;
@@ -257,6 +262,13 @@ void Transferencia(int ido, int idd, float valor, char url[]){
     }
     free(ReadControl.cliente);
 }
+
+// Função de exclusão de usuário
+// Recebe como entrada a struct de controle, o id do usuário a ser excluido (ide) e o nome do arquivo de dados (url)
+// Por se tratar de uma void function não oferece nenhum retorno
+// Asssim como a função de transferência, foi feito a leitura do arquivo e armazenado em um ponteiro de structs
+// e depois de feito as alterações necessárias, o arquivo é reescrito com as novas informações 
+
 void ExcluirUsuario(int ide, char url[]){
 
     user ReadUser;
@@ -330,11 +342,13 @@ int VerificaNumeroNome( char nome[]){
 
 int main(){
 
+    // Declaração das variáveis que utilizam das structs
     controle controle;	
     controle.cliente = (user*)malloc(2*sizeof(user));
     controle.tamanho = 1;
     controle.qtd_id = 0;
 
+    // Declaração das variáveis uteis para a manipulação dos arquivos
     char url [] = "dados.txt";
     char url2 [] = "DadosFinais.txt";
     // char nome [100];
@@ -343,6 +357,7 @@ int main(){
     user ReadUser;
     user WriteUser;
 
+    // Declaração das variáveis uteis para a manipulação do menu
     char opcao;
     int quantidade;
     int i;
@@ -486,6 +501,7 @@ int main(){
             system("pause");
             system("cls");
             break;
+            // Mostrar todos os usuários (senha de administrador)
         case 7:
             system("cls"); 
             puts("Digite a senha de administrador: ");
@@ -495,6 +511,7 @@ int main(){
             system("pause");
             system("cls");
             break;
+            // Despedida do programa
         case 0:
             system("cls"); 
             Adeus();
